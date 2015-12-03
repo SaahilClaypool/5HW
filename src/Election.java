@@ -23,12 +23,26 @@ class ElectionData {
             System.out.println(s);
         }
     }
-    public void processVotes(String one, String two, String three)
-    {
+    public void processVotes(String first, String second, String third) throws DuplicateVotesException, UnknownCandidateException {
+        if(!ballot.contains(first)){
+            throw new UnknownCandidateException(first);
+        }
+        if(!ballot.contains(second)){
+            throw new UnknownCandidateException(second);
+        }
+        if(!ballot.contains(second)){
+            throw new UnknownCandidateException(second);
+        }
+        if(first.equals(second) || first.equals(third)){
+            throw new DuplicateVotesException(first);
+        }
+        if(second.equals(third)){
+            throw new DuplicateVotesException(second);
+        }
 
-        firstChoice.put(one, firstChoice.get(one) +1);
-        secondChoice.put(two , secondChoice.get(two) +1);
-        thirdChoice.put(three, thirdChoice.get(three) +1);
+        firstChoice.put(first, firstChoice.get(first) +1);
+        secondChoice.put(second , secondChoice.get(second) +1);
+        thirdChoice.put(third, thirdChoice.get(third) +1);
     }
     public void addCandidate(String cand) throws CandidateExistsException{
         if(!ballot.contains(cand)){
@@ -63,7 +77,43 @@ class ElectionData {
         return numvotes;*/
         return 1;
     }
-
+    public String findWinnerMostFirstVotes(){
+        final String[] keyMax = {""};
+        final int[] maxVal = {0};
+        firstChoice.forEach((key,value)->{
+            if(value> maxVal[0]){
+                maxVal[0] = value;
+                keyMax[0] = key;
+            }
+        });
+        return keyMax[0];
+    }
+    private HashMap<String, Integer> getSumMap(){
+        final HashMap<String, Integer> totalPoints = new HashMap<String,Integer>();
+        totalPoints.putAll(firstChoice);
+        firstChoice.forEach((key, value)->{
+            totalPoints.put(key, totalPoints.get(key) + value);
+        });
+        secondChoice.forEach((key, value)->{
+            totalPoints.put(key, totalPoints.get(key) + value);
+        });
+        secondChoice.forEach((key, value)->{
+            totalPoints.put(key, totalPoints.get(key) + value);
+        });
+        return totalPoints;
+    }
+    public String findWinnerMostPoints(){
+        HashMap<String,Integer> totalPoints = getSumMap();
+        final int[] maxVal = {0};
+        final String[] maxKey = {""};
+        totalPoints.forEach((key,value)-> {
+            if(value > maxVal[0]){
+                maxVal[0] = value;
+                maxKey[0] = key;
+            }
+        });
+        return maxKey[0];
+    }
     public static void main(String[] args) {
         ElectionData el = new ElectionData();
         el.screen();
